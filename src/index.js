@@ -11,16 +11,16 @@ let currentPage = 1;
 loadMore.style.visibility = "hidden";
   
 async function getData(e) {
-    e.preventDefault();
-    
+  e.preventDefault();
+  try {
     const userSearch = input.value;
     const response = await axios.get(`https://pixabay.com/api?key=35585241-0d017fc6894dff5aad1093c8d&q=${userSearch}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40`
     );
     console.log(response.data);
     response.data.hits.forEach(item => {
-        const div = document.createElement('div');
-        div.setAttribute('class', 'photo-card');
-        div.innerHTML = `
+      const div = document.createElement('div');
+      div.setAttribute('class', 'photo-card');
+      div.innerHTML = `
   <img src="${item.webformatURL}" alt="${item.tags}" loading="lazy" />
   <div class="info">
     <p class="info-item">
@@ -36,9 +36,12 @@ async function getData(e) {
       <b>Downloads: ${item.downloads}</b>
     </p>
   </div>`
-        gallery.append(div);
+      gallery.append(div);
     });
     loadMore.style.visibility = "block";
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 
