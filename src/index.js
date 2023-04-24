@@ -1,6 +1,6 @@
 import './css/styles.css';
-import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import axios from 'axios';
 import SimpleLightbox from "simplelightbox";
 import fetchImages from './js/fetch-data';
 import createMarkup from './js/markup';
@@ -29,13 +29,9 @@ function onFormSubmit (e) {
     sendFetch();
   }
 }
-/*async function sendFetch() {
 
-  fetchImages(page).then(data => markup(data));
-  page += 1;
-}*/
-function sendFetch() {
-  fetchImages(page).then(data => markup(data));
+async function sendFetch() {
+ await fetchImages(page).then(data => markup(data));
   page += 1;
 }
 
@@ -69,11 +65,14 @@ function notify(data) {
 
   return true;
 }
+/*function simpleLightbox() {
+  const galleryHandle = new SimpleLightbox('.photo-card a');
+  galleryHandle.on('show.simplelightbox');
+  galleryHandle.refresh();
+ }*/
 
-/*let currentPage = 1;
 
-loadMore.style.visibility = "hidden";
-  
+/*
 async function getData(e) {
   e.preventDefault();
   try {
