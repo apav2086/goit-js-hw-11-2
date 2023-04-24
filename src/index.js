@@ -1,12 +1,76 @@
+import './css/styles.css';
 import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from "simplelightbox";
-//import GalleryAPI from '/fetch-gallery';
-const formEl = document.querySelector('#search-form');
-const input = document.querySelector('[name="searchQuery"]');
-const gallery = document.querySelector('.gallery');
-const loadMore = document.querySelector('.load-more');
-let currentPage = 1;
+import fetchImages from './js/fetch-data';
+import createMarkup from './js/markup';
+const refs = {
+  searchForm: document.querySelector('#search-form'),
+  input: document.querySelector('[name="searchQuery"]'),
+  imagesList: document.querySelector('.photo-list'),
+  loadMore: document.querySelector('.load-more'),
+};
+refs.loadMore.classList.add('button-hidden');
+ 
+refs.searchForm.addEventListener('submit', onFormSubmit);
+refs.loadMore.addEventListener('click', sendFetch);
+let page = 1;
+let showNotify = 0;
+let imageRemainder = 0;
+ 
+function onFormSubmit (e) {
+  e.preventDefault();
+  refs.loadMore.classList.add('button-hidden');
+
+  if (refs.input.value.trim()) {
+    refs.imagesList.innerHTML = '';
+    page = 1;
+    showNotify = 0;
+    sendFetch();
+  }
+}
+/*async function sendFetch() {
+
+  fetchImages(page).then(data => markup(data));
+  page += 1;
+}*/
+function sendFetch() {
+  fetchImages(page).then(data => markup(data));
+  page += 1;
+}
+
+function markup(data) {
+  if (notify(data)) {
+    refs.imagesList.insertAdjacentHTML('beforeend', createMarkup(data.hits));
+  }
+}
+
+function notify(data) {
+  if (data.totalHits === 0) {
+    Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+    return false;
+  }
+
+  if (showNotify === 0) {
+    Notify.success(`Hooray! We found ${data.totalHits} images.`);
+    showNotify = 1;
+    imageRemainder = data.totalHits;
+  }
+  imageRemainder -= 40;
+
+  if (imageRemainder <= 0) {
+    refs.loadMore.classList.add('button-hidden');
+    setTimeout(() => {
+      Notify.warning("We're sorry, but you've reached the end of search results."), 2000;
+    });
+  } else {
+    refs.loadMore.classList.remove('button-hidden');
+  }
+
+  return true;
+}
+
+/*let currentPage = 1;
 
 loadMore.style.visibility = "hidden";
   
@@ -49,4 +113,4 @@ formEl.addEventListener('submit', getData);
 loadMore.addEventListener('click', (e) => {
     currentPage++;
     getData(e);
-})
+})*/
